@@ -23,6 +23,7 @@ var (
 
 	NotebookCullerKind = reflect.TypeOf(&NotebookCuller{}).Elem().Name()
 	NotebookKind       = reflect.TypeOf(&Notebook{}).Elem().Name()
+	ProfileKind        = reflect.TypeOf(&Profile{}).Elem().Name()
 )
 
 func init() {
@@ -31,5 +32,9 @@ func init() {
 		&NotebookList{},
 		&NotebookCuller{},
 		&NotebookCullerList{},
+		&Profile{},
+		&ProfileList{},
+		&ProfileConfig{},
+		&ProfileConfigList{},
 	)
 }

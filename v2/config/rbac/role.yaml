@@ -24,11 +24,23 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - namespaces
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
   - pods
   verbs:
   - get
   - list
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - '*'
 - apiGroups:
   - ""
   resources:
@@ -44,8 +56,28 @@ rules:
   verbs:
   - '*'
 - apiGroups:
+  - kubeflow.org
+  resources:
+  - profiles
+  - profiles/finalizers
+  - profiles/status
+  verbs:
+  - '*'
+- apiGroups:
   - networking.istio.io
   resources:
   - virtualservices
+  verbs:
+  - '*'
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - '*'
+- apiGroups:
+  - security.istio.io
+  resources:
+  - authorizationpolicies
   verbs:
   - '*'

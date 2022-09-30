@@ -7,6 +7,17 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
+func (in *Notebook) Default() {}
+
+func (in *Notebook) ValidateCreate() error                   { return nil }
+func (in *Notebook) ValidateUpdate(old runtime.Object) error { return nil }
+func (in *Notebook) ValidateDelete() error                   { return nil }
+
+var (
+	_ admission.Validator = &Notebook{}
+	_ admission.Defaulter = &Notebook{}
+)
+
 func (in *NotebookCuller) Default() {
 	if in.Options.Duration == "" {
 		// default is 24 hours

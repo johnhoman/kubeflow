@@ -3,6 +3,7 @@ package feature
 type Flag int
 
 const (
-	NotebookController Flag = iota
-	NotebookCuller
+	NotebookCulling Flag = iota
+	Istio
+	Reflection
 )

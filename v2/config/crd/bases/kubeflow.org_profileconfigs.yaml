@@ -1,0 +1,110 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.8.0
+  creationTimestamp: null
+  name: profileconfigs.kubeflow.org
+spec:
+  group: kubeflow.org
+  names:
+    kind: ProfileConfig
+    listKind: ProfileConfigList
+    plural: profileconfigs
+    singular: profileconfig
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              namespace:
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  prefix:
+                    type: string
+                type: object
+              plugins:
+                items:
+                  properties:
+                    spec:
+                      properties:
+                        awsIamRole:
+                          type: string
+                        gcpServiceAccount:
+                          type: string
+                      type: object
+                  type: object
+                type: array
+              quota:
+                properties:
+                  hard:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    type: object
+                  scopeSelector:
+                    properties:
+                      matchExpressions:
+                        items:
+                          properties:
+                            operator:
+                              type: string
+                            scopeName:
+                              type: string
+                            values:
+                              items:
+                                type: string
+                              type: array
+                          required:
+                          - operator
+                          - scopeName
+                          type: object
+                        type: array
+                    type: object
+                  scopes:
+                    items:
+                      type: string
+                    type: array
+                type: object
+              role:
+                properties:
+                  admin:
+                    type: string
+                  edit:
+                    type: string
+                  view:
+                    type: string
+                type: object
+              user:
+                properties:
+                  idHeader:
+                    type: string
+                  idPrefix:
+                    type: string
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
