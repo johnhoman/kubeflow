@@ -111,6 +111,7 @@ type ProfileConfigSpec struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster
 
 type ProfileConfig struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -120,7 +121,6 @@ type ProfileConfig struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:scope=Cluster
 
 type ProfileConfigList struct {
 	metav1.TypeMeta `json:",inline"`

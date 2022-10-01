@@ -14,10 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package poddefault
+package configmap
 
 import (
 	"context"
+	"github.com/kubeflow/kubeflow/v2/apis/centraldashboard/v1alpha1"
 	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -57,7 +58,7 @@ var _ = ginkgo.BeforeSuite(func() {
 
 	ginkgo.By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("../../../../../../config/crd/bases")},
+		CRDDirectoryPaths:     []string{filepath.Join("../../../../../config/crd/bases")},
 		ErrorIfCRDPathMissing: true,
 	}
 
@@ -68,6 +69,8 @@ var _ = ginkgo.BeforeSuite(func() {
 	gomega.Expect(cfg).NotTo(gomega.BeNil())
 
 	err = v1.AddToScheme(scheme.Scheme)
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+	err = v1alpha1.AddToScheme(scheme.Scheme)
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{

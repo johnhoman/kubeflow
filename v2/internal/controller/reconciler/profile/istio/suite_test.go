@@ -19,18 +19,19 @@ package istio
 import (
 	"context"
 	"path/filepath"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	"testing"
 
 	"github.com/kubeflow/kubeflow/v2/apis/core/v1"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
+	securityv1beta1 "istio.io/client-go/pkg/apis/security/v1beta1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	//+kubebuilder:scaffold:imports
@@ -57,7 +58,10 @@ var _ = ginkgo.BeforeSuite(func() {
 
 	ginkgo.By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("../../../../../config/crd/bases")},
+		CRDDirectoryPaths: []string{
+			filepath.Join("../../../../../config/crd/bases"),
+			filepath.Join("../../../../../config/crd/thirdparty/istio.io"),
+		},
 		ErrorIfCRDPathMissing: true,
 	}
 
@@ -67,8 +71,8 @@ var _ = ginkgo.BeforeSuite(func() {
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 	gomega.Expect(cfg).NotTo(gomega.BeNil())
 
-	err = v1.AddToScheme(scheme.Scheme)
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+	gomega.Expect(v1.AddToScheme(scheme.Scheme)).NotTo(gomega.HaveOccurred())
+	gomega.Expect(securityv1beta1.AddToScheme(scheme.Scheme)).Should(gomega.Succeed())
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                 scheme.Scheme,

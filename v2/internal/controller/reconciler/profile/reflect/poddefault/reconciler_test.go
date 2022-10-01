@@ -1,4 +1,4 @@
-package configmap
+package poddefault
 
 import (
 	"github.com/kubeflow/kubeflow/v2/apis/core/v1"
