@@ -32,6 +32,8 @@ func init() {
 		&NotebookList{},
 		&NotebookCuller{},
 		&NotebookCullerList{},
+		&PodDefault{},
+		&PodDefaultList{},
 		&Profile{},
 		&ProfileList{},
 		&ProfileConfig{},

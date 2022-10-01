@@ -6,8 +6,8 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
-    ctrl "sigs.k8s.io/controller-runtime"
-    "sigs.k8s.io/controller-runtime/pkg/client"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"testing"
 )
@@ -47,22 +47,21 @@ func TestEnqueueRequestForProfiles_add(t *testing.T) {
 		WithObjects(profiles...).
 		Build().(client.Reader)
 
-    q := &Q{}
-    handler := &EnqueueRequestForProfiles{Reader: reader}
-    handler.add(q)
-    for _, item := range profiles {
-        req := ctrl.Request{NamespacedName: client.ObjectKeyFromObject(item)}
-        g.Expect(*q).Should(gomega.ContainElement(req))
-    }
+	q := &Q{}
+	handler := &EnqueueRequestForProfiles{Reader: reader}
+	handler.add(q)
+	for _, item := range profiles {
+		req := ctrl.Request{NamespacedName: client.ObjectKeyFromObject(item)}
+		g.Expect(*q).Should(gomega.ContainElement(req))
+	}
 }
-
 
 type Q []ctrl.Request
 
 func (q *Q) Add(v interface{}) {
-    req, ok := v.(ctrl.Request)
-    if !ok {
-        return
-    }
-    *q = append(*q, req)
+	req, ok := v.(ctrl.Request)
+	if !ok {
+		return
+	}
+	*q = append(*q, req)
 }

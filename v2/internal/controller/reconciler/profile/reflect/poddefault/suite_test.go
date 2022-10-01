@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package poddefault
+package configmap
 
 import (
 	"context"
@@ -57,7 +57,7 @@ var _ = ginkgo.BeforeSuite(func() {
 
 	ginkgo.By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("../../../../config/crd/bases")},
+		CRDDirectoryPaths:     []string{filepath.Join("../../../../../../config/crd/bases")},
 		ErrorIfCRDPathMissing: true,
 	}
 

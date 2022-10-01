@@ -7,32 +7,42 @@ import (
 	v1 "github.com/kubeflow/kubeflow/v2/apis/core/v1"
 	"github.com/kubeflow/kubeflow/v2/internal/controller/reconciler/profile/watch"
 	"github.com/kubeflow/kubeflow/v2/internal/logging"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+)
+
+const (
+	reasonCreatedConfigMap xpevent.Reason = "CreatedConfigMap"
+	reasonUpdatedConfigMap xpevent.Reason = "UpdatedConfigMap"
 )
 
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 
-	name := "kubeflow/"
+	const name = "kubeflow/reflect/configmap"
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
-		// For(
-		//   builder.WithPredicates(watch.LabelPredicate(labelReflect, "enabled")),
-		// ).
+		For(&v1.Profile{}).
 		Watches(
-			&source.Kind{Type: &v1.Profile{}},
+			&source.Kind{Type: &corev1.ConfigMap{}},
 			&watch.EnqueueRequestForProfiles{Reader: mgr.GetClient()},
+			builder.WithPredicates(
+				watch.LabelPredicate(labelReflect, "true"),
+				watch.InNamespace("kubeflow"),
+			),
 		).
+		WithOptions(o).
 		Complete(NewReconciler(mgr,
 			WithLogger(logging.NewLogrLogger(mgr.GetLogger().WithValues("controller", name))),
 			WithEventRecorder(xpevent.NewAPIRecorder(mgr.GetEventRecorderFor(name))),
 		))
 }
-
 
 type ReconcilerOption func(r *Reconciler)
 
@@ -69,10 +79,43 @@ type Reconciler struct {
 }
 
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+
+	profile := &v1.Profile{}
+	if err := r.client.Get(ctx, req.NamespacedName, profile); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	mapList := &corev1.ConfigMapList{}
+	if err := r.client.List(ctx, mapList, client.MatchingLabels{labelReflect: "true"}, client.InNamespace("kubeflow")); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	for _, item := range mapList.Items {
+		configMap := &corev1.ConfigMap{}
+		configMap.SetName(item.Name)
+		configMap.SetNamespace(profile.Name)
+		res, err := controllerutil.CreateOrPatch(ctx, r.client, configMap, func() error {
+			if err := controllerutil.SetControllerReference(profile, configMap, r.scheme); err != nil {
+				return err
+			}
+			configMap.Data = item.Data
+			configMap.BinaryData = item.BinaryData
+			configMap.Labels = item.Labels
+			configMap.Annotations = item.Annotations
+			configMap.Immutable = item.Immutable
+			return nil
+		})
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		switch res {
+		case controllerutil.OperationResultCreated:
+			r.record.Event(profile, xpevent.Normal(reasonCreatedConfigMap, "reflected", "from", item.Name))
+		case controllerutil.OperationResultUpdated:
+			r.record.Event(profile, xpevent.Normal(reasonUpdatedConfigMap, "reflected", "from", item.Name))
+		}
+	}
 	return ctrl.Result{}, nil
 }
 
-var (
-	labelReflect = fmt.Sprintf("profile.%s/reflect", v1.Group)
-)
-
+var labelReflect = fmt.Sprintf("profile.%s/reflect", v1.Group)

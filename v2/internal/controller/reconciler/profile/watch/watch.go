@@ -48,7 +48,6 @@ type adder interface {
 
 var _ handler.EventHandler = &EnqueueRequestForProfiles{}
 
-
 func LabelPredicate(key, value string) predicate.Predicate {
 	return predicate.NewPredicateFuncs(func(o client.Object) bool {
 		labels := o.GetLabels()
@@ -56,5 +55,11 @@ func LabelPredicate(key, value string) predicate.Predicate {
 			return labels[key] == value
 		}
 		return false
+	})
+}
+
+func InNamespace(ns string) predicate.Predicate {
+	return predicate.NewPredicateFuncs(func(o client.Object) bool {
+		return o.GetNamespace() == ns
 	})
 }

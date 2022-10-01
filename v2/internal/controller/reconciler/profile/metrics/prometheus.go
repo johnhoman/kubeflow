@@ -10,16 +10,28 @@ import (
 
 var (
 	counterCreatedRoleBinding = prometheus.NewCounterVec(
-		prometheus.CounterOpts{},
-		[]string{"profile-name", "role-name", "service-account-name", "owner"},
+		prometheus.CounterOpts{
+			Namespace: "kubeflow",
+			Subsystem: "profile_controller",
+			Name:      "created_role_binding",
+		},
+		[]string{"profile", "role", "serviceaccount", "owner"},
 	)
 	counterUpdatedRoleBinding = prometheus.NewCounterVec(
-		prometheus.CounterOpts{},
-		[]string{"profile-name", "role-name", "service-account-name", "owner"},
+		prometheus.CounterOpts{
+			Namespace: "kubeflow",
+			Subsystem: "profile_controller",
+			Name:      "updated_role_binding",
+		},
+		[]string{"profile", "role", "serviceaccount", "owner"},
 	)
 	counterDeletedRoleBinding = prometheus.NewCounterVec(
-		prometheus.CounterOpts{},
-		[]string{"profile-name", "role-name", "service-account-name", "owner"},
+		prometheus.CounterOpts{
+			Namespace: "kubeflow",
+			Subsystem: "profile_controller",
+			Name:      "deleted_role_binding",
+		},
+		[]string{"profile", "role", "serviceaccount", "owner"},
 	)
 )
 
