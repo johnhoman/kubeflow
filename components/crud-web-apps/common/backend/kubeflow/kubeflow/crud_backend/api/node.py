@@ -1,6 +1,5 @@
-from .. import authz
-from . import custom_api, storage_api, v1_core
+from . import v1
 
 
-def list_nodes():
-    return v1_core.list_node()
+def list_nodes(api=v1()):
+    return api.list_node()

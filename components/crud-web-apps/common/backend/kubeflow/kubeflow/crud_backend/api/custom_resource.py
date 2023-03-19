@@ -1,29 +1,53 @@
-from .. import authz
-from . import custom_api
+from .. import authn
+from . import custom_objects_api
 
 
 def create_custom_rsrc(group, version, kind, data, namespace):
-    authz.ensure_authorized("create", group, version, kind, namespace)
-    return custom_api.create_namespaced_custom_object(group, version,
-                                                      namespace, kind, data)
+    api = custom_objects_api(authn.get_username())
+    return api.create_namespaced_custom_object(
+        group,
+        version,
+        namespace,
+        kind,
+        data,
+    )
 
 
-def delete_custom_rsrc(group, version, kind, name, namespace,
-                       policy="Foreground"):
-    authz.ensure_authorized("delete", group, version, kind, namespace)
-    return custom_api.delete_namespaced_custom_object(
-        group, version, namespace, kind, name, propagation_policy=policy
+def delete_custom_rsrc(
+        group,
+        version,
+        kind,
+        name,
+        namespace,
+        policy="Foreground",
+):
+    api = custom_objects_api(authn.get_username())
+    return api.delete_namespaced_custom_object(
+        group,
+        version,
+        namespace,
+        kind,
+        name,
+        propagation_policy=policy,
     )
 
 
 def list_custom_rsrc(group, version, kind, namespace):
-    authz.ensure_authorized("list", group, version, kind, namespace)
-    return custom_api.list_namespaced_custom_object(group, version, namespace,
-                                                    kind)
+    api = custom_objects_api(authn.get_username())
+    return api.list_namespaced_custom_object(
+        group,
+        version,
+        namespace,
+        kind,
+    )
 
 
 def get_custom_rsrc(group, version, kind, namespace, name):
-    authz.ensure_authorized("get", group, version, kind, namespace)
-
-    return custom_api.get_namespaced_custom_object(group, version, namespace,
-                                                   kind, name)
+    api = custom_objects_api(authn.get_username())
+    return api.get_namespaced_custom_object(
+        group,
+        version,
+        namespace,
+        kind,
+        name,
+    )

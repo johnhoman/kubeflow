@@ -1,7 +1,7 @@
 from .. import authz
-from . import v1_core
+from . import v1
 
 
 @authz.needs_authorization("list", "core", "v1", "namespaces")
-def list_namespaces():
-    return v1_core.list_namespace()
+def list_namespaces(api=v1()):
+    return api.list_namespace()

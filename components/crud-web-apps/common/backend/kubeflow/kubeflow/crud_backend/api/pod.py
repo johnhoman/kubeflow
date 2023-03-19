@@ -1,17 +1,18 @@
-from .. import authz
-from . import v1_core
+from .. import authn
+from . import v1
 
 
 def list_pods(namespace, auth=True, label_selector = None):
+    username = ""
     if auth:
-        authz.ensure_authorized("list", "", "v1", "pods", namespace)
+        username = authn.get_username()
+    api = v1(username)
+    return api.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
 
-    return v1_core.list_namespaced_pod(namespace = namespace, label_selector = label_selector)
 
 def get_pod_logs(namespace, pod, container, auth=True):
+    username = ""
     if auth:
-        authz.ensure_authorized("get", "", "v1", "pods", namespace, "log")
-
-    return v1_core.read_namespaced_pod_log(
-        namespace=namespace, name=pod, container=container
-    )
+        username = authn.get_username()
+    api = v1(username)
+    return api.read_namespaced_pod_log(namespace=namespace, name=pod, container=container)
